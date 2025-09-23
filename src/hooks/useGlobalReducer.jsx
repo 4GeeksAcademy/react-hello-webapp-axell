@@ -1,24 +1,115 @@
-// Import necessary hooks and functions from React.
-import { useContext, useReducer, createContext } from "react";
-import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
+import React, { createContext, useReducer, useContext } from "react";
 
-// Create a context to hold the global state of the application
-// We will call this global state the "store" to avoid confusion while using local states
-const StoreContext = createContext()
+// Estado inicial
+export const initialStore = {
+  contacts: [],
+};
 
-// Define a provider component that encapsulates the store and warps it in a context provider to 
-// broadcast the information throught all the app pages and components.
-export function StoreProvider({ children }) {
-    // Initialize reducer with the initial state.
-    const [store, dispatch] = useReducer(storeReducer, initialStore())
-    // Provide the store and dispatch method to all child components.
-    return <StoreContext.Provider value={{ store, dispatch }}>
-        {children}
-    </StoreContext.Provider>
+// Reducer
+function storeReducer(state, action) {
+  switch (action.type) {
+    case "SET_CONTACTS":
+      return { ...state, contacts: action.payload };
+    case "ADD_CONTACT":
+      return { ...state, contacts: [...state.contacts, action.payload] };
+    case "UPDATE_CONTACT":
+      return {
+        ...state,
+        contacts: state.contacts.map(c =>
+          c.id === action.payload.id ? { ...c, ...action.payload } : c
+        ),
+      };
+    case "DELETE_CONTACT":
+      return { ...state, contacts: state.contacts.filter(c => c.id !== action.payload) };
+    default:
+      return state;
+  }
 }
 
-// Custom hook to access the global state and dispatch function.
-export default function useGlobalReducer() {
-    const { dispatch, store } = useContext(StoreContext)
-    return { dispatch, store };
-}
+// Context
+export const Context = createContext();
+
+// Provider
+export const StoreProvider = ({ children }) => {
+  const [store, dispatch] = useReducer(storeReducer, initialStore);
+
+  const actions = {
+    getContacts: async () => {
+      try {
+        const resp = await fetch("https://playground.4geeks.com/contact/agendas/axelluribe/contacts");
+        const data = await resp.json();
+        dispatch({ type: "SET_CONTACTS", payload: data.contacts || [] });
+      } catch (err) {
+        console.error("Error al obtener contactos:", err);
+      }
+    },
+
+    addContact: async contact => {
+      try {
+        const resp = await fetch(
+          "https://playground.4geeks.com/contact/agendas/axelluribe/contacts",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...contact,
+              agenda_slug: "axelluribe" // obligatorio
+            }),
+          }
+        );
+
+        if (!resp.ok) throw new Error("Error al crear contacto");
+
+        actions.getContacts();
+      } catch (err) {
+        console.error(err);
+      }
+    },
+
+    updateContact: async (id, contact) => {
+      try {
+        const resp = await fetch(
+          `https://playground.4geeks.com/contact/agendas/axelluribe/contacts/${id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...contact,
+              agenda_slug: "axelluribe" // obligatorio
+            }),
+          }
+        );
+
+        if (!resp.ok) throw new Error("Error al actualizar contacto");
+
+        actions.getContacts();
+      } catch (err) {
+        console.error(err);
+      }
+    },
+
+    deleteContact: async id => {
+      try {
+        const resp = await fetch(
+          `https://playground.4geeks.com/contact/agendas/axelluribe/contacts/${id}`,
+          { method: "DELETE" }
+        );
+
+        if (!resp.ok) throw new Error("Error al eliminar contacto");
+
+        actions.getContacts();
+      } catch (err) {
+        console.error(err);
+      }
+    },
+  };
+
+  return (
+    <Context.Provider value={{ store, actions }}>
+      {children}
+    </Context.Provider>
+  );
+};
+
+// Hook personalizado
+export const useStore = () => useContext(Context);
