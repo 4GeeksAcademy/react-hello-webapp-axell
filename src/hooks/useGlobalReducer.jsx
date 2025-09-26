@@ -1,10 +1,9 @@
 import React, { createContext, useReducer, useContext } from "react";
 
-
 export const initialStore = {
   contacts: [],
+  todos: [] 
 };
-
 
 function storeReducer(state, action) {
   switch (action.type) {
@@ -21,14 +20,14 @@ function storeReducer(state, action) {
       };
     case "DELETE_CONTACT":
       return { ...state, contacts: state.contacts.filter(c => c.id !== action.payload) };
+    case "SET_TODOS":
+      return { ...state, todos: action.payload };
     default:
       return state;
   }
 }
 
-
 export const Context = createContext();
-
 
 export const StoreProvider = ({ children }) => {
   const [store, dispatch] = useReducer(storeReducer, initialStore);
@@ -51,16 +50,12 @@ export const StoreProvider = ({ children }) => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              ...contact,
-              agenda_slug: "axelluribe" // obligatorio
-            }),
+            body: JSON.stringify({ ...contact, agenda_slug: "axelluribe" }),
           }
         );
-
         if (!resp.ok) throw new Error("Error al crear contacto");
-
-        actions.getContacts();
+        const newContact = await resp.json();
+        dispatch({ type: "ADD_CONTACT", payload: newContact });
       } catch (err) {
         console.error(err);
       }
@@ -73,16 +68,12 @@ export const StoreProvider = ({ children }) => {
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              ...contact,
-              agenda_slug: "axelluribe" // obligatorio
-            }),
+            body: JSON.stringify({ ...contact, agenda_slug: "axelluribe" }),
           }
         );
-
         if (!resp.ok) throw new Error("Error al actualizar contacto");
-
-        actions.getContacts();
+        const updatedContact = await resp.json();
+        dispatch({ type: "UPDATE_CONTACT", payload: updatedContact });
       } catch (err) {
         console.error(err);
       }
@@ -94,10 +85,8 @@ export const StoreProvider = ({ children }) => {
           `https://playground.4geeks.com/contact/agendas/axelluribe/contacts/${id}`,
           { method: "DELETE" }
         );
-
         if (!resp.ok) throw new Error("Error al eliminar contacto");
-
-        actions.getContacts();
+        dispatch({ type: "DELETE_CONTACT", payload: id });
       } catch (err) {
         console.error(err);
       }
@@ -105,11 +94,10 @@ export const StoreProvider = ({ children }) => {
   };
 
   return (
-    <Context.Provider value={{ store, actions }}>
+    <Context.Provider value={{ store, actions, dispatch }}>
       {children}
     </Context.Provider>
   );
 };
-
 
 export const useStore = () => useContext(Context);

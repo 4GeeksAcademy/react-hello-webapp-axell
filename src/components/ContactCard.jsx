@@ -3,12 +3,19 @@ import { useStore } from "../hooks/useGlobalReducer";
 import { Link } from "react-router-dom";
 
 export const ContactCard = ({ contact }) => {
-  const { actions } = useStore();
-  const [showModal, setShowModal] = useState(false); 
+  const { dispatch } = useStore();
+  const [showModal, setShowModal] = useState(false);
 
   const handleDelete = async () => {
-    await actions.deleteContact(contact.id);
-    setShowModal(false); 
+    try {
+      await fetch(`https://playground.4geeks.com/contact/agendas/axelluribe/contacts/${contact.id}`, {
+        method: "DELETE",
+      });
+      dispatch({ type: "DELETE_CONTACT", payload: contact.id });
+      setShowModal(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -19,45 +26,24 @@ export const ContactCard = ({ contact }) => {
         <p>{contact.address}</p>
       </div>
       <div>
-        <Link to={`/edit/${contact.id}`} className="btn btn-warning me-2">
-          Editar
-        </Link>
-        <button className="btn btn-danger" onClick={() => setShowModal(true)}>
-          Eliminar
-        </button>
+        <Link to={`/edit/${contact.id}`} className="btn btn-warning me-2">Editar</Link>
+        <button className="btn btn-danger" onClick={() => setShowModal(true)}>Eliminar</button>
       </div>
 
-      
       {showModal && (
         <div className="modal show d-block" tabIndex="-1" role="dialog">
           <div className="modal-dialog modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Confirmar Eliminación</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowModal(false)}
-                ></button>
+                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
               </div>
               <div className="modal-body">
                 <p>¿Estás seguro de que deseas eliminar a {contact.full_name}?</p>
               </div>
               <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={handleDelete}
-                >
-                  Eliminar
-                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
+                <button type="button" className="btn btn-danger" onClick={handleDelete}>Eliminar</button>
               </div>
             </div>
           </div>

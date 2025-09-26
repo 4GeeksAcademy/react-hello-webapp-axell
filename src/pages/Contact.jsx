@@ -17,8 +17,8 @@ export const Contact = () => {
         <Link to="/add" className="btn btn-primary">➕ Nuevo Contacto</Link>
       </div>
       {store.contacts.length > 0 ? (
-        store.contacts.map(contact => (
-          <ContactCard key={contact.id} contact={contact} />
+        store.contacts.map((contact, index) => (
+          <ContactCard key={contact.id || index} contact={contact} />
         ))
       ) : (
         <p>No hay contactos</p>
