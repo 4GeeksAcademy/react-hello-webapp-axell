@@ -1,11 +1,11 @@
 import React, { createContext, useReducer, useContext } from "react";
 
-// Estado inicial
+
 export const initialStore = {
   contacts: [],
 };
 
-// Reducer
+
 function storeReducer(state, action) {
   switch (action.type) {
     case "SET_CONTACTS":
@@ -26,10 +26,10 @@ function storeReducer(state, action) {
   }
 }
 
-// Context
+
 export const Context = createContext();
 
-// Provider
+
 export const StoreProvider = ({ children }) => {
   const [store, dispatch] = useReducer(storeReducer, initialStore);
 
@@ -111,5 +111,5 @@ export const StoreProvider = ({ children }) => {
   );
 };
 
-// Hook personalizado
+
 export const useStore = () => useContext(Context);
