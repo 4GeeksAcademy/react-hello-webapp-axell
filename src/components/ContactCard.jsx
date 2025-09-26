@@ -26,7 +26,7 @@ export const ContactCard = ({ contact }) => {
         <p>{contact.address}</p>
       </div>
       <div>
-        <Link to={`/edit/${contact.id}`} className="btn btn-warning me-2">Editar</Link>
+        <Link to={`/edit/${contact.id}`} className="btn btn-warning me-2">Editar✏️</Link>
         <button className="btn btn-danger" onClick={() => setShowModal(true)}>Eliminar</button>
       </div>
 
