@@ -1,55 +1,44 @@
-const getState = ({ getStore, getActions, setStore }) => {
-	return {
-		store: {
-			contacts: []
-		},
-		actions: {
-			getContacts: async () => {
-				try {
-					const resp = await fetch("https://playground.4geeks.com/contact/agendas/axelluribe/contacts");
-					if (!resp.ok) throw new Error("Error fetching contacts");
-					const data = await resp.json();
-					setStore({ contacts: data.contacts || [] });
-				} catch (err) {
-					console.error(err);
-				}
-			},
-			addContact: async contact => {
-				try {
-					await fetch("https://playground.4geeks.com/contact/agendas/axelluribe/contacts", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify(contact)
-					});
-					getActions().getContacts();
-				} catch (err) {
-					console.error(err);
-				}
-			},
-			updateContact: async (id, contact) => {
-				try {
-					await fetch(`https://playground.4geeks.com/contact/agendas/axelluribe/contacts/${id}`, {
-						method: "PUT",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify(contact)
-					});
-					getActions().getContacts();
-				} catch (err) {
-					console.error(err);
-				}
-			},
-			deleteContact: async id => {
-				try {
-					await fetch(`https://playground.4geeks.com/contact/agendas/axelluribe/contacts/${id}`, {
-						method: "DELETE"
-					});
-					getActions().getContacts();
-				} catch (err) {
-					console.error(err);
-				}
-			}
-		}
-	};
+export const initialStore = {
+  message: null,
+  todos: [
+    { id: 1, title: "Make the bed", background: null },
+    { id: 2, title: "Do my homework", background: null },
+  ],
+  contacts: [],
 };
 
-export default getState;
+export default function storeReducer(store, action = {}) {
+  switch (action.type) {
+    case "add_task":
+      const { id, color } = action.payload;
+      return {
+        ...store,
+        todos: store.todos.map(todo =>
+          todo.id === id ? { ...todo, background: color } : todo
+        )
+      };
+
+    case "SET_CONTACTS":
+      return { ...store, contacts: action.payload };
+
+    case "ADD_CONTACT":
+      return { ...store, contacts: [...store.contacts, action.payload] };
+
+    case "UPDATE_CONTACT":
+      return {
+        ...store,
+        contacts: store.contacts.map(c =>
+          c.id === action.payload.id ? { ...c, ...action.payload } : c
+        )
+      };
+
+    case "DELETE_CONTACT":
+      return {
+        ...store,
+        contacts: store.contacts.filter(c => c.id !== action.payload)
+      };
+
+    default:
+      throw Error("Unknown action.");
+  }
+}

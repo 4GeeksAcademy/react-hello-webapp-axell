@@ -1,8 +1,8 @@
 import { Link, useParams } from "react-router-dom";
-import { useStore } from "../hooks/useGlobalReducer";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Single = () => {
-  const { store } = useStore();
+  const { store } = useGlobalReducer(); 
   const { theId } = useParams();
   const singleTodo = store.todos?.find(todo => todo.id === parseInt(theId));
 

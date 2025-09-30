@@ -1,16 +1,17 @@
 import React, { useState } from "react";
-import { useStore } from "../hooks/useGlobalReducer";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 import { Link } from "react-router-dom";
 
 export const ContactCard = ({ contact }) => {
-  const { dispatch } = useStore();
+  const { dispatch } = useGlobalReducer(); 
   const [showModal, setShowModal] = useState(false);
 
   const handleDelete = async () => {
     try {
-      await fetch(`https://playground.4geeks.com/contact/agendas/axelluribe/contacts/${contact.id}`, {
-        method: "DELETE",
-      });
+      await fetch(
+        `https://playground.4geeks.com/contact/agendas/axelluribe/contacts/${contact.id}`,
+        { method: "DELETE" }
+      );
       dispatch({ type: "DELETE_CONTACT", payload: contact.id });
       setShowModal(false);
     } catch (err) {

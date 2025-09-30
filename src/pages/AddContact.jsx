@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useStore } from "../hooks/useGlobalReducer";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 import { useNavigate, useParams } from "react-router-dom";
 
 export const AddContact = () => {
-  const { store, dispatch } = useStore();
+  const { store, dispatch } = useGlobalReducer(); 
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -31,19 +31,25 @@ export const AddContact = () => {
 
     try {
       if (id) {
-        const resp = await fetch(`https://playground.4geeks.com/contact/agendas/axelluribe/contacts/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...form, agenda_slug: "axelluribe" }),
-        });
+        const resp = await fetch(
+          `https://playground.4geeks.com/contact/agendas/axelluribe/contacts/${id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...form, agenda_slug: "axelluribe" }),
+          }
+        );
         const updatedContact = await resp.json();
         dispatch({ type: "UPDATE_CONTACT", payload: updatedContact });
       } else {
-        const resp = await fetch('https://playground.4geeks.com/contact/agendas/axelluribe/contacts', {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...form, agenda_slug: "axelluribe" }),
-        });
+        const resp = await fetch(
+          "https://playground.4geeks.com/contact/agendas/axelluribe/contacts",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...form, agenda_slug: "axelluribe" }),
+          }
+        );
         const newContact = await resp.json();
         dispatch({ type: "ADD_CONTACT", payload: newContact });
       }
@@ -58,10 +64,42 @@ export const AddContact = () => {
     <div className="container mt-4">
       <h2>{id ? "Editar Contacto" : "Agregar Contacto"}</h2>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="full_name" placeholder="Nombre completo" className="form-control mb-2" value={form.full_name} onChange={handleChange} required />
-        <input type="email" name="email" placeholder="Email" className="form-control mb-2" value={form.email} onChange={handleChange} required />
-        <input type="text" name="phone" placeholder="Teléfono" className="form-control mb-2" value={form.phone} onChange={handleChange} required />
-        <input type="text" name="address" placeholder="Dirección" className="form-control mb-2" value={form.address} onChange={handleChange} required />
+        <input
+          type="text"
+          name="full_name"
+          placeholder="Nombre completo"
+          className="form-control mb-2"
+          value={form.full_name}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          className="form-control mb-2"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="phone"
+          placeholder="Teléfono"
+          className="form-control mb-2"
+          value={form.phone}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="address"
+          placeholder="Dirección"
+          className="form-control mb-2"
+          value={form.address}
+          onChange={handleChange}
+          required
+        />
         <button type="submit" className="btn btn-success">Guardar</button>
         <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate("/")}>Cancelar</button>
       </form>

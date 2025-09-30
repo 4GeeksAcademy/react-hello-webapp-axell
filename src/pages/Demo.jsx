@@ -1,8 +1,12 @@
 import { Link } from "react-router-dom";
-import { useStore } from "../hooks/useGlobalReducer";
+import useGlobalReducer from "../hooks/useGlobalReducer"; 
 
 export const Demo = () => {
-  const { store, actions } = useStore();
+  const { store, dispatch } = useGlobalReducer(); 
+
+  const changeColor = (id, color) => {
+    dispatch({ type: "add_task", payload: { id, color } });
+  };
 
   return (
     <div className="container">
@@ -19,9 +23,7 @@ export const Demo = () => {
 
             <button
               className="btn btn-success"
-              onClick={() =>
-                actions.updateContact(item.id, { background: "#ffa500" })
-              }
+              onClick={() => changeColor(item.id, "#ffa500")}
             >
               Change Color
             </button>
