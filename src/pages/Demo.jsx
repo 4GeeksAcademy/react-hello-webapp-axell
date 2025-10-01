@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import useGlobalReducer from "../hooks/useGlobalReducer"; 
+import { useGlobalReducer } from "../hooks/useGlobalReducer"; 
 
 export const Demo = () => {
   const { store, dispatch } = useGlobalReducer(); 

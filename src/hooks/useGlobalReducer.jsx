@@ -1,24 +1,15 @@
-
-import { useContext, useReducer, createContext } from "react";
+import { createContext, useReducer, useContext } from "react";
 import storeReducer, { initialStore } from "../store";
-
 
 const StoreContext = createContext();
 
+export const StoreProvider = ({ children }) => {
+  const [store, dispatch] = useReducer(storeReducer, initialStore);
+  return (
+    <StoreContext.Provider value={{ store, dispatch }}>
+      {children}
+    </StoreContext.Provider>
+  );
+};
 
-export function StoreProvider({ children }) {
-    
-    const [store, dispatch] = useReducer(storeReducer, initialStore);
-
-    return (
-        <StoreContext.Provider value={{ store, dispatch }}>
-            {children}
-        </StoreContext.Provider>
-    );
-}
-
-
-export default function useGlobalReducer() {
-    const { dispatch, store } = useContext(StoreContext);
-    return { dispatch, store };
-}
+export const useGlobalReducer = () => useContext(StoreContext);

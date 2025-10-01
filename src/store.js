@@ -15,7 +15,7 @@ export default function storeReducer(store, action = {}) {
         ...store,
         todos: store.todos.map(todo =>
           todo.id === id ? { ...todo, background: color } : todo
-        )
+        ),
       };
 
     case "SET_CONTACTS":
@@ -29,16 +29,16 @@ export default function storeReducer(store, action = {}) {
         ...store,
         contacts: store.contacts.map(c =>
           c.id === action.payload.id ? { ...c, ...action.payload } : c
-        )
+        ),
       };
 
     case "DELETE_CONTACT":
       return {
         ...store,
-        contacts: store.contacts.filter(c => c.id !== action.payload)
+        contacts: store.contacts.filter(c => c.id !== action.payload),
       };
 
     default:
-      throw Error("Unknown action.");
+      throw new Error("Unknown action.");
   }
 }
